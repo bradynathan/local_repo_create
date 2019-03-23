@@ -1,0 +1,6 @@
+---
+# defaults file for local_repo
+local_repo_working_directory: /tmp/local_repo
+local_repo_target_name: repo
+local_repo_remote_path: /working
+local_repo_docker_name: repo_builder

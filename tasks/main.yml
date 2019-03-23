@@ -1,0 +1,41 @@
+---
+# tasks file for local_repo
+- name: Make sure package url list was provided
+  assert:
+    that: local_repo_package_urls is defined
+    msg: "A list of packages must be provided"
+
+- name: Make sure working directory exist
+  file:
+    path: "{{ local_repo_working_directory }}"
+    state: directory
+
+- name: Create the build script
+  template:
+    src: repo_build.sh.j2
+    dest: "{{ local_repo_working_directory }}/repo_build.sh"
+
+- name: Bring up Docker container
+  docker_container:
+    name: "{{ local_repo_docker_name }}"
+    image: centos
+    entrypoint: "bash {{ local_repo_remote_path }}/repo_build.sh"
+    recreate: true
+    cleanup: true
+    volumes:
+      - "{{ local_repo_working_directory }}:{{ local_repo_remote_path }}:rw"
+  register: container_result
+
+- debug: var=container_result.ansible_facts.docker_container.Id
+
+- name: Waiting for build to finish
+  shell: docker ps | grep {{ local_repo_docker_name }}
+  register: status_result
+  until: status_result.rc != 0
+  retries: 60
+  delay: 10
+  failed_when: false
+  changed_when: false
+
+- debug:
+    msg: "Created repo in archive {{ local_repo_working_directory }}/{{ local_repo_target_name }}.tgz"

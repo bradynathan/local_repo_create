@@ -1,0 +1,12 @@
+---
+- hosts: localhost
+  gather_facts: false
+  become: false
+  vars:
+    local_repo_target_name: elastic
+    local_repo_package_urls:
+      - https://artifacts.elastic.co/downloads/kibana/kibana-6.6.2-x86_64.rpm
+      - https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.6.2.rpm
+      - https://artifacts.elastic.co/downloads/logstash/logstash-6.6.2.rpm
+  roles:
+    - ../../local_repo_create

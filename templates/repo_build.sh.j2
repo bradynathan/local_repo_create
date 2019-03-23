@@ -1,0 +1,19 @@
+#! /bin/bash
+# Building a repository
+
+# Create repo is used to build metadata
+yum install -y createrepo wget
+
+# Create directory where repository will be built
+mkdir ~/{{ local_repo_target_name }}
+cd ~/{{ local_repo_target_name }}
+
+{% for url in local_repo_package_urls %}
+wget {{ url }}
+{% endfor %}
+
+# Create meta-data
+createrepo ~/{{ local_repo_target_name }}
+
+cd ~
+tar czf {{ local_repo_remote_path }}/{{ local_repo_target_name }}.tgz {{ local_repo_target_name }}
